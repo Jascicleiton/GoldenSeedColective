@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - GroundDecoration1
+  - GroundDecoration2
+  - BoundsConfiner
+  - ItemsParentTransform
+  - CropsParentTransform
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Ground1
+    uniqueID: 1854853649
+    locked: 0
+  - name: Ground2
+    uniqueID: 2379247285
+    locked: 0
+  - name: Ground3
+    uniqueID: 165824103
+    locked: 0
+  - name: GroundDecoration1
+    uniqueID: 3702362337
+    locked: 0
+  - name: GroundDecoration2
+    uniqueID: 2632466773
+    locked: 0
+  - name: Instances
+    uniqueID: 3115741049
+    locked: 0
+  - name: Front1
+    uniqueID: 3289186777
+    locked: 0
+  - name: Front2
+    uniqueID: 4261348763
+    locked: 0
+  - name: Collisions
+    uniqueID: 3322141653
+    locked: 0
