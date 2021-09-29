@@ -45,15 +45,18 @@ public class Player : Singleton<Player>
 #pragma warning disable 414
     private Direction playerDirection;
 
-   #pragma warning restore 414
+#pragma warning restore 414
 
     private GridCursor gridCursor;
     private Cursor cursor;
+    private Transform parentItem;
 
     private List<CharacterAttribute> characterAttributeCustomisationList;
 
     [Tooltip("Should be populated in the prefab with equipped item sprite renderer")]
     [SerializeField] private SpriteRenderer equippedItemSpriteRenderer = null;
+
+    [SerializeField] private GameObject itemPrefab = null;
 
     // Player attributes that can be swapped
     private CharacterAttribute armsCharacterAttribute;
@@ -98,12 +101,14 @@ public class Player : Singleton<Player>
     {
         EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
+        EventHandler.AfterSceneLoadEvent += SceneLoaded;
     }
 
     private void OnDisable()
     {
         EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
+        EventHandler.AfterSceneLoadEvent -= SceneLoaded;
     }
 
     private void Update()
@@ -260,7 +265,7 @@ public class Player : Singleton<Player>
                 case ItemType.Seed:
                     if (Input.GetMouseButtonDown(0))
                     {
-                        ProcessPlayerClickInputSeed( gridPropertyDetails, itemDetails);
+                        ProcessPlayerClickInputSeed(gridPropertyDetails, itemDetails);
                     }
                     break;
                 case ItemType.Commodity:
@@ -275,8 +280,10 @@ public class Player : Singleton<Player>
                 case ItemType.CollectingTool:
                 case ItemType.ChoppingTool:
                 case ItemType.BreakingTool:
+                case ItemType.DiggingTool:
                     ProcessPlayerClickInputTool(gridPropertyDetails, itemDetails, playerDirection);
                     break;
+
                 case ItemType.none:
                     break;
                 case ItemType.count:
@@ -289,15 +296,15 @@ public class Player : Singleton<Player>
 
     private Vector3Int GetPlayerClickDirection(Vector3Int cursorGridPosition, Vector3Int playerGridPosition)
     {
-        if(cursorGridPosition.x > playerGridPosition.x)
+        if (cursorGridPosition.x > playerGridPosition.x)
         {
             return Vector3Int.right;
         }
-        else if(cursorGridPosition.x < playerGridPosition.x)
+        else if (cursorGridPosition.x < playerGridPosition.x)
         {
             return Vector3Int.left;
         }
-        else if(cursorGridPosition.y > playerGridPosition.y)
+        else if (cursorGridPosition.y > playerGridPosition.y)
         {
             return Vector3Int.up;
         }
@@ -309,7 +316,7 @@ public class Player : Singleton<Player>
 
     private Vector3Int GetPlayerDirection(Vector3 cursorPosition, Vector3 playerPosition)
     {
-        if( 
+        if (
             cursorPosition.x > playerPosition.x
             &&
             cursorPosition.y < (playerPosition.y + cursor.itemUseRadius / 2f)
@@ -326,10 +333,10 @@ public class Player : Singleton<Player>
             &&
             cursorPosition.y > (playerPosition.y - cursor.itemUseRadius / 2f)
             )
-            {
+        {
             return Vector3Int.left;
         }
-        else if( cursorPosition.y > playerPosition.y)
+        else if (cursorPosition.y > playerPosition.y)
         {
             return Vector3Int.up;
         }
@@ -345,13 +352,13 @@ public class Player : Singleton<Player>
         {
             PlantSeedAtCursor(gridPropertyDetails, itemDetails);
         }
-        else if(itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
+        else if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
         {
             EventHandler.CallDropSelectedItemEvent();
         }
     }
 
-        private void ProcessPlayerClickInputCommodity(ItemDetails itemDetails)
+    private void ProcessPlayerClickInputCommodity(ItemDetails itemDetails)
     {
         if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid)
         {
@@ -370,34 +377,40 @@ public class Player : Singleton<Player>
                 }
                 break;
             case ItemType.HoeingTool:
-                if(gridCursor.CursorPositionIsValid)
+                if (gridCursor.CursorPositionIsValid)
                 {
                     HoeGroundAtCursor(gridPropertyDetails, playerDirection);
                 }
                 break;
             case ItemType.ChoppingTool:
-                if(gridCursor.CursorPositionIsValid)
+                if (gridCursor.CursorPositionIsValid)
                 {
                     ChopInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
             case ItemType.BreakingTool:
-                if(gridCursor.CursorPositionIsValid)
+                if (gridCursor.CursorPositionIsValid)
                 {
                     BreakInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
             case ItemType.ReapingTool:
-                if(cursor.isCursorPositionValid)
+                if (cursor.isCursorPositionValid)
                 {
                     playerDirection = GetPlayerDirection(cursor.GetWorldPositionForCursor(), GetPlayerCenterPosition());
                     ReapInPlayerDirectionAtCursor(itemDetails, playerDirection);
                 }
                 break;
             case ItemType.CollectingTool:
-                if(gridCursor.CursorPositionIsValid)
+                if (gridCursor.CursorPositionIsValid)
                 {
                     CollectInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                }
+                break;
+            case ItemType.DiggingTool:
+                if (gridCursor.CursorPositionIsValid)
+                {
+                    DigInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
             default:
@@ -405,7 +418,7 @@ public class Player : Singleton<Player>
         }
     }
 
-   
+
 
     private void WaterGroundAtCursor(GridPropertyDetails gridPropertyDetails, Vector3Int playerDirection)
     {
@@ -482,19 +495,19 @@ public class Player : Singleton<Player>
         characterAttributeCustomisationList.Add(toolCharacterAttribute);
         animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
 
-        if(playerDirection == Vector3Int.right)
+        if (playerDirection == Vector3Int.right)
         {
             isUsingToolRight = true;
         }
-        else if(playerDirection == Vector3Int.left)
+        else if (playerDirection == Vector3Int.left)
         {
             isUsingToolLeft = true;
         }
-        else if(playerDirection == Vector3Int.up)
+        else if (playerDirection == Vector3Int.up)
         {
             isUsingToolUp = true;
         }
-        else if(playerDirection == Vector3Int.down)
+        else if (playerDirection == Vector3Int.down)
         {
             isUsingToolDown = true;
         }
@@ -502,7 +515,7 @@ public class Player : Singleton<Player>
         yield return useToolAnimationPause;
 
         // Set gridPropertyDetails for dug ground
-        if(gridPropertyDetails.daysSinceDug == -1)
+        if (gridPropertyDetails.daysSinceDug == -1)
         {
             gridPropertyDetails.daysSinceDug = 0;
         }
@@ -598,24 +611,24 @@ public class Player : Singleton<Player>
 
     private void UseToolInPlayerDirection(ItemDetails equippedItemDetails, Vector3Int playerDirection)
     {
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             switch (equippedItemDetails.itemType)
             {
                 case ItemType.ReapingTool:
-                    if(playerDirection == Vector3Int.right)
+                    if (playerDirection == Vector3Int.right)
                     {
                         isSwingingToolRight = true;
                     }
-                    else if(playerDirection == Vector3Int.left)
+                    else if (playerDirection == Vector3Int.left)
                     {
                         isSwingingToolLeft = true;
                     }
-                    else if(playerDirection == Vector3Int.up)
+                    else if (playerDirection == Vector3Int.up)
                     {
                         isSwingingToolUp = true;
                     }
-                    else if(playerDirection == Vector3Int.down)
+                    else if (playerDirection == Vector3Int.down)
                     {
                         isSwingingToolDown = true;
                     }
@@ -623,7 +636,7 @@ public class Player : Singleton<Player>
             }
 
             // Define center position of square which will be used for colision testing
-            Vector2 point = new Vector2(GetPlayerCenterPosition().x + (playerDirection.x * (equippedItemDetails.itemUseRadius / 2f)), 
+            Vector2 point = new Vector2(GetPlayerCenterPosition().x + (playerDirection.x * (equippedItemDetails.itemUseRadius / 2f)),
                                         GetPlayerCenterPosition().y + (playerDirection.y * (equippedItemDetails.itemUseRadius / 2f)));
 
             // Define size of the square which will be used for collision testing
@@ -636,10 +649,10 @@ public class Player : Singleton<Player>
             // Loop through all items retrieved
             for (int i = itemArray.Length - 1; i >= 0; i--)
             {
-                if(itemArray[i] != null)
+                if (itemArray[i] != null)
                 {
                     // Destroy Item GameObject if reapable
-                    if(InventoryManager.Instance.GetItemDetails(itemArray[i].ItemCode).itemType == ItemType.ReapableScenery)
+                    if (InventoryManager.Instance.GetItemDetails(itemArray[i].ItemCode).itemType == ItemType.ReapableScenery)
                     {
                         // Efect Position
                         Vector3 effectPosition = new Vector3(itemArray[i].transform.position.x, itemArray[i].transform.position.y + Settings.gridCellSize / 2f,
@@ -650,7 +663,7 @@ public class Player : Singleton<Player>
                         Destroy(itemArray[i].gameObject);
 
                         reapableItemCount++;
-                        if(reapableItemCount >= Settings.maxTargetComponentsToDestroyPerReapSwing)
+                        if (reapableItemCount >= Settings.maxTargetComponentsToDestroyPerReapSwing)
                         {
                             break;
                         }
@@ -699,6 +712,93 @@ public class Player : Singleton<Player>
 
     }
 
+    private void DigInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        StartCoroutine(DigInPlayerDirectionRoutine(gridPropertyDetails, itemDetails, playerDirection));
+    }
+
+    private IEnumerator DigInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    {
+        _playerInputIsDisabled = true;
+        playerToolUseDisabled = true;
+
+        // Set tool animation to hoe in overrideAnimation
+        toolCharacterAttribute.partVariantType = PartVariantType.shovel;
+        characterAttributeCustomisationList.Clear();
+        characterAttributeCustomisationList.Add(toolCharacterAttribute);
+        animationOverrides.ApplyCharacterCustomisationParameters(characterAttributeCustomisationList);
+
+        if (playerDirection == Vector3Int.right)
+        {
+            isUsingToolRight = true;
+        }
+        else if (playerDirection == Vector3Int.left)
+        {
+            isUsingToolLeft = true;
+        }
+        else if (playerDirection == Vector3Int.up)
+        {
+            isUsingToolUp = true;
+        }
+        else if (playerDirection == Vector3Int.down)
+        {
+            isUsingToolDown = true;
+        }
+
+        yield return useToolAnimationPause;
+
+        // Set gridPropertyDetails for dug ground
+        if (gridPropertyDetails.daysSinceDug == -1)
+        {
+            gridPropertyDetails.daysSinceDug = 0;
+        }
+
+        // Set gridProperty to dug
+        GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
+
+        // Display dug grid tiles
+        GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails);
+
+        SpawnDugItems(itemDetails);
+
+        // After animation pause
+        yield return afterUseToolAnimationPause;
+
+        _playerInputIsDisabled = false;
+        playerToolUseDisabled = false;
+    }
+
+    private void SpawnDugItems(ItemDetails equippedItemDetails)
+    {
+        
+        if (equippedItemDetails.lootItemCodeList.Count > 0)
+        {
+            if (equippedItemDetails.itemBonusPercentage > 0)
+            {
+                float chanceToHarvest = Random.Range(0, 1);
+                
+                if (chanceToHarvest <= equippedItemDetails.itemBonusPercentage)
+                {
+                    for (int i = 0; i < equippedItemDetails.lootItemCodeList.Count; i++)
+                    {
+                        Vector3 worldPosition = new Vector3((gameObject.transform.position.x + Random.Range(0.5f, 1f)), (gameObject.transform.position.y + Random.Range(0.5f, 1f)), -mainCamera.transform.position.z);
+                        // Create item from prefab at mouse position
+                        GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2, worldPosition.z), Quaternion.identity, parentItem);
+                        Item item = itemGameObject.GetComponent<Item>();
+                        item.ItemCode = equippedItemDetails.lootItemCodeList[i];
+                    }
+                    //TODO: Create a variable for the wellbeing change
+                    EventHandler.CallChangeWellBeing(1f);
+                }
+                else
+                {
+                    //TODO: Create a variable for the wellbeing change
+                    EventHandler.CallChangeWellBeing(-1f);
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Process crop with equipped item in player direction
     /// </summary>
@@ -708,6 +808,7 @@ public class Player : Singleton<Player>
         {
             case ItemType.ChoppingTool:
             case ItemType.BreakingTool:
+          
                 if (playerDirection == Vector3Int.right)
                 {
                     isUsingToolRight = true;
@@ -751,7 +852,7 @@ public class Player : Singleton<Player>
         Crop crop = GridPropertiesManager.Instance.GetCropObjectAtGridLocation(gridPropertyDetails);
 
         // Execute process tool action for crop
-        if(crop != null)
+        if (crop != null)
         {
             switch (equippedItemDetails.itemType)
             {
@@ -760,11 +861,14 @@ public class Player : Singleton<Player>
                     break;
                 case ItemType.ChoppingTool:
                 case ItemType.BreakingTool:
+               
                     crop.ProcessToolAction(equippedItemDetails, isUsingToolRight, isUsingToolLeft, isUsingToolDown, isUsingToolUp);
                     break;
-               
+
             }
         }
+
+       
     }
 
     public void EnablePlayerInput()
@@ -777,7 +881,7 @@ public class Player : Singleton<Player>
         _playerInputIsDisabled = true;
     }
 
-     private void ResetMovement()
+    private void ResetMovement()
     {
         // Reset movement
         xInput = 0f;
@@ -801,8 +905,6 @@ public class Player : Singleton<Player>
             false, false, false, false);
     }
 
-   
-
     public Vector3 GetPlayerViewportPosition()
     {
         return mainCamera.WorldToViewportPoint(transform.position);
@@ -813,10 +915,10 @@ public class Player : Singleton<Player>
         return new Vector3(transform.position.x, transform.position.y + Settings.playerCenterYOffset, transform.position.z);
     }
 
-    public void ShowCarriedItem (int itemCode)
+    public void ShowCarriedItem(int itemCode)
     {
         ItemDetails itemDetails = InventoryManager.Instance.GetItemDetails(itemCode);
-        if(itemDetails != null)
+        if (itemDetails != null)
         {
             equippedItemSpriteRenderer.sprite = itemDetails.itemSprite;
             equippedItemSpriteRenderer.color = new Color(1f, 1f, 1f, 1f);
@@ -852,19 +954,24 @@ public class Player : Singleton<Player>
     private void PlayerTestInput()
     {
         // advances a minute
-        if(Input.GetKey(KeyCode.T))
+        if (Input.GetKey(KeyCode.T))
         {
             TimeManager.Instance.TestAdvanceGameMinute();
         }
         // advance a day
-        if(Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetKeyDown(KeyCode.Y))
         {
             TimeManager.Instance.TestAdvanceGameDay();
         }
         // advance a season
-       if(Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.U))
         {
             TimeManager.Instance.TestAdvanceGameSeason();
         }
+    }
+
+    private void SceneLoaded()
+    {
+        parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
     }
 }

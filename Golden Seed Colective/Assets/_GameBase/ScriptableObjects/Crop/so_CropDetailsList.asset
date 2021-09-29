@@ -29,14 +29,14 @@ MonoBehaviour:
     - {fileID: 7193783865090184285, guid: 5a1df36ac90cfa242908df77f9674580, type: 3}
     seasons: 0000000001000000
     harvestedSprite: {fileID: 21300000, guid: 0a1268bf801d5304ebf16458d7309ac1, type: 3}
-    harvestedTansformItemCode: 0
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 1
     disableCropCollidersBeforeHarvestedAnimation: 0
     isHarvestedAnimation: 1
     isHaverstActionEffect: 0
     spawnCropProduceAtPlayerPosition: 1
     harvestActionEffect: 5
-    harvestToolItemCodes: 1c270000
+    harvestToolItemCodes: 1c27000028270000
     requiredHarvestActions: 01000000
     cropProducedItemCode: 1727000016270000
     cropProducedMinQuantity: 0100000000000000
@@ -58,7 +58,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344, type: 3}
     seasons: 000000000100000002000000
     harvestedSprite: {fileID: 0}
-    harvestedTansformItemCode: 10010
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 0
     disableCropCollidersBeforeHarvestedAnimation: 0
     isHarvestedAnimation: 1
@@ -79,7 +79,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344, type: 3}
     seasons: 00000000010000000200000003000000
     harvestedSprite: {fileID: 0}
-    harvestedTansformItemCode: 0
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 0
     disableCropCollidersBeforeHarvestedAnimation: 0
     isHarvestedAnimation: 1
@@ -108,7 +108,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344, type: 3}
     seasons: 00000000010000000300000003000000
     harvestedSprite: {fileID: 0}
-    harvestedTansformItemCode: 10011
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 0
     disableCropCollidersBeforeHarvestedAnimation: 0
     isHarvestedAnimation: 1
@@ -129,7 +129,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 89c46045b5f23d840b62099f6f1f6344, type: 3}
     seasons: 00000000010000000300000003000000
     harvestedSprite: {fileID: 0}
-    harvestedTansformItemCode: 0
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 0
     disableCropCollidersBeforeHarvestedAnimation: 0
     isHarvestedAnimation: 1
@@ -150,7 +150,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 4fb548784c08c2c40b86a99493efa98d, type: 3}
     seasons: 00000000010000000300000003000000
     harvestedSprite: {fileID: 21300000, guid: 7700e9e59e6f58e4598ea8f2e5a84cc1, type: 3}
-    harvestedTansformItemCode: 0
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 1
     disableCropCollidersBeforeHarvestedAnimation: 1
     isHarvestedAnimation: 1
@@ -171,7 +171,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: ffd3a07e9702a614284d1e5a4be9f532, type: 3}
     seasons: 00000000010000000300000003000000
     harvestedSprite: {fileID: 21300000, guid: 7700e9e59e6f58e4598ea8f2e5a84cc1, type: 3}
-    harvestedTansformItemCode: 0
+    harvestedTransformItemCode: 0
     hideCropBeforeHarvestedAnimation: 1
     disableCropCollidersBeforeHarvestedAnimation: 1
     isHarvestedAnimation: 1

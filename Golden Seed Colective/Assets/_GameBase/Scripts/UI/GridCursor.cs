@@ -127,6 +127,7 @@ public class GridCursor : MonoBehaviour
                 case ItemType.ChoppingTool:
                 case ItemType.ReapingTool:
                 case ItemType.CollectingTool:
+                case ItemType.DiggingTool:
                     if (!IsCursorValidForTool(gridPropertyDetails, itemDetails))
                     {
                         SetCursorToInvalid();
@@ -180,6 +181,7 @@ public class GridCursor : MonoBehaviour
                 }
 
             case ItemType.HoeingTool:
+            case ItemType.DiggingTool:
                 if (gridPropertyDetails.isDiggable == true && gridPropertyDetails.daysSinceDug == -1)
                 {
                     #region Need to get any items at location so we can check if they are reapable

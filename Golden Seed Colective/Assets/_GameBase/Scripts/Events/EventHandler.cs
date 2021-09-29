@@ -219,4 +219,17 @@ public static class EventHandler
         }
     }
     #endregion Crops
+
+    #region Player
+    // Change Wellbeing
+    public static event Action <float> ChangeWellBeing;
+    
+    public static void CallChangeWellBeing(float wellbeingValueToChange)
+    {
+        if(ChangeWellBeing != null)
+        {
+            ChangeWellBeing(wellbeingValueToChange);
+        }
+    }
+    #endregion
 }

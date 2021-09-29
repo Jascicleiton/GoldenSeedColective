@@ -60,6 +60,7 @@ public enum PartVariantType
     axe,
     scythe,
     wateringCan,
+    shovel,
     count
 }
 
@@ -145,6 +146,7 @@ public enum ItemType
     CollectingTool,
     ReapableScenery,
     Furniture,
+    DiggingTool,
     none,
     count
 }

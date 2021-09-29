@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class ItemDetails
@@ -15,4 +16,6 @@ public class ItemDetails
     public bool canBeDropped;
     public bool canBeEaten;
     public bool canBeCarried;
+    public float itemBonusPercentage;
+    public List<int> lootItemCodeList;
 }

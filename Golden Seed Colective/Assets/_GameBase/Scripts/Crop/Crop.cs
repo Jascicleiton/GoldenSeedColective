@@ -14,23 +14,28 @@ public class Crop : MonoBehaviour
 
     public void ProcessToolAction(ItemDetails equippedItemDetails, bool isToolRight, bool isToolLeft, bool isToolDown, bool isToolUp)
     {
+        if (equippedItemDetails.itemType == ItemType.DiggingTool)
+        {
+            HandleDig(equippedItemDetails);
+        }
+
         // Get grid property details
         GridPropertyDetails gridPropertyDetails = GridPropertiesManager.Instance.GetGridPropertyDetails(cropGridPosition.x, cropGridPosition.y);
-                if(gridPropertyDetails == null)
+        if (gridPropertyDetails == null)
         {
             return;
         }
 
         // Get seed item details
         ItemDetails seedItemDetails = InventoryManager.Instance.GetItemDetails(gridPropertyDetails.seedItemCode);
-        if(seedItemDetails == null)
+        if (seedItemDetails == null)
         {
             return;
         }
 
         // Get crop details
         CropDetails cropDetails = GridPropertiesManager.Instance.GetCropDetails(seedItemDetails.itemCode);
-        if(cropDetails == null)
+        if (cropDetails == null)
         {
             return;
         }
@@ -38,45 +43,55 @@ public class Crop : MonoBehaviour
         // Try to get animator for crop
         Animator animator = GetComponentInChildren<Animator>();
         // Trigger tool animation
-        if(animator != null)
+        if (animator != null)
         {
-            if(isToolRight || isToolUp)
+            if (isToolRight || isToolUp)
             {
                 animator.SetTrigger("usetoolright");
             }
-            else if(isToolLeft || isToolDown)
+            else if (isToolLeft || isToolDown)
             {
                 animator.SetTrigger("usetoolleft");
             }
         }
 
-        if(cropDetails.isHaverstActionEffect)
+        if (cropDetails.isHaverstActionEffect)
         {
             EventHandler.CallHarvestActionEffectEvent(harvestActionEffectTansform.position, cropDetails.harvestActionEffect);
         }
 
         // Get required harvest action for tool
         int requiredHarvestActions = cropDetails.RequiredHarvestActionsForTool(equippedItemDetails.itemCode);
-        if(requiredHarvestActions == -1)
+        if (requiredHarvestActions == -1)
         {
             return; // This tool can't be used to harvest this crop
         }
+
+
 
         harvestActionCount++;
 
         // Check if required harvest actions made
         if (harvestActionCount >= requiredHarvestActions)
         {
-            HarvestCrop(isToolRight, isToolUp, cropDetails, gridPropertyDetails, animator);
+            HarvestCrop(isToolRight, isToolUp, cropDetails, gridPropertyDetails, animator, equippedItemDetails);
         }
     }
 
-    private void HarvestCrop(bool isUsingToolRight, bool isUsingToolUp, CropDetails cropDetails, GridPropertyDetails gridPropertyDetails, Animator animator)
+    private void HandleDig(ItemDetails equippedItemDetails)
+    {
+        print("HandleDig");
+        CropDetails cropDetails = GridPropertiesManager.Instance.GetCropDetails(10016);
+        SpawnHarvestedItems(cropDetails, equippedItemDetails);
+
+    }
+
+    private void HarvestCrop(bool isUsingToolRight, bool isUsingToolUp, CropDetails cropDetails, GridPropertyDetails gridPropertyDetails, Animator animator, ItemDetails equippedItemDetails)
     {
         // Is there a harvested animation
-        if(cropDetails.isHarvestedAnimation && animator != null)
+        if (cropDetails.isHarvestedAnimation && animator != null)
         {
-            if(cropDetails.harvestedSprite != null)
+            if (cropDetails.harvestedSprite != null)
             {
                 cropHarvestedSpriteRenderer.sprite = cropDetails.harvestedSprite;
             }
@@ -104,7 +119,7 @@ public class Crop : MonoBehaviour
         }
 
         // Should box colliders be disabled before harvest
-        if(cropDetails.disableCropCollidersBeforeHarvestedAnimation)
+        if (cropDetails.disableCropCollidersBeforeHarvestedAnimation)
         {
             Collider2D[] colliders2D = GetComponentsInChildren<Collider2D>();
             foreach (Collider2D collider2D in colliders2D)
@@ -116,21 +131,21 @@ public class Crop : MonoBehaviour
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
         //Is there a harvested animation - Destroy this crop gameObject after animation is completed
-        if(cropDetails.isHarvestedAnimation && animator != null)
+        if (cropDetails.isHarvestedAnimation && animator != null)
         {
-            StartCoroutine(ProcessHarvestActionsAfterAnimation(cropDetails, gridPropertyDetails, animator));
+            StartCoroutine(ProcessHarvestActionsAfterAnimation(cropDetails, gridPropertyDetails, animator, equippedItemDetails));
         }
         else
         {
-             HarvestActions(cropDetails, gridPropertyDetails);
+            HarvestActions(cropDetails, gridPropertyDetails, equippedItemDetails);
         }
     }
 
-    private void HarvestActions(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
+    private void HarvestActions(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails, ItemDetails equippedItemDetails)
     {
-        SpawnHarvestedItems(cropDetails);
+        SpawnHarvestedItems(cropDetails, equippedItemDetails);
         // Does this crop transforms into another crop
-        if(cropDetails.harvestedTansformItemCode > 0)
+        if (cropDetails.harvestedTransformItemCode > 0)
         {
             CreateHarvestedTransformCrop(cropDetails, gridPropertyDetails);
         }
@@ -141,7 +156,7 @@ public class Crop : MonoBehaviour
     private void CreateHarvestedTransformCrop(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails)
     {
         // Update crop in grid properties
-        gridPropertyDetails.seedItemCode = cropDetails.harvestedTansformItemCode;
+        gridPropertyDetails.seedItemCode = cropDetails.harvestedTransformItemCode;
         gridPropertyDetails.growthDays = 0;
         gridPropertyDetails.daysSinceLastharvest = -1;
         gridPropertyDetails.daysSinceWatered = -1;
@@ -151,25 +166,26 @@ public class Crop : MonoBehaviour
         GridPropertiesManager.Instance.DisplayPlantedCrop(gridPropertyDetails);
     }
 
-    private IEnumerator ProcessHarvestActionsAfterAnimation(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails, Animator animator)
+    private IEnumerator ProcessHarvestActionsAfterAnimation(CropDetails cropDetails, GridPropertyDetails gridPropertyDetails, Animator animator, ItemDetails equippedItemDetails)
     {
         while (!animator.GetCurrentAnimatorStateInfo(0).IsName("Harvested"))
         {
             yield return null;
         }
 
-        HarvestActions(cropDetails, gridPropertyDetails);
+        HarvestActions(cropDetails, gridPropertyDetails, equippedItemDetails);
     }
 
-    private void SpawnHarvestedItems(CropDetails cropDetails)
+    private void SpawnHarvestedItems(CropDetails cropDetails, ItemDetails equippedItemDetails)
     {
+
         // Spawn the item(s) to be produced
         for (int i = 0; i < cropDetails.cropProducedItemCode.Length; i++)
         {
             int cropsToProduce;
 
             // Calculate how many crops to produce
-            if(cropDetails.cropProducedMaxQuantitty[i] <= cropDetails.cropProducedMinQuantity[i])
+            if (cropDetails.cropProducedMaxQuantitty[i] <= cropDetails.cropProducedMinQuantity[i])
             {
                 cropsToProduce = cropDetails.cropProducedMinQuantity[i];
             }
@@ -180,7 +196,7 @@ public class Crop : MonoBehaviour
             for (int j = 0; j < cropsToProduce; j++)
             {
                 Vector3 spawnPosition;
-                if(cropDetails.spawnCropProduceAtPlayerPosition)
+                if (cropDetails.spawnCropProduceAtPlayerPosition)
                 {
                     InventoryManager.Instance.AddItem(InventoryLocation.player, cropDetails.cropProducedItemCode[i]);
                 }
@@ -191,6 +207,7 @@ public class Crop : MonoBehaviour
                     SceneItemsManager.Instance.InstantiateSceneItem(cropDetails.cropProducedItemCode[i], spawnPosition);
                 }
             }
+
         }
     }
 }

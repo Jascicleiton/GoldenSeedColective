@@ -12,7 +12,7 @@ public class CropDetails
     public Sprite harvestedSprite; // sprite used once harvested
 
     [ItemCodeDescription]
-    public int harvestedTansformItemCode; // if the item transforms into another item when harvested this item code will be populated
+    public int harvestedTransformItemCode; // if the item transforms into another item when harvested this item code will be populated
     public bool hideCropBeforeHarvestedAnimation; // if the crop shoul be disabled before the harvested animation
     public bool disableCropCollidersBeforeHarvestedAnimation; // if colliders on crop shoul be disabled to avoid the harvested animation affecting any other game objects
     public bool isHarvestedAnimation; // true if harvested animation is to be played on final growth stage prefab

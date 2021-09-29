@@ -4751,6 +4751,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equippedItemSpriteRenderer: {fileID: 1807941087}
+  itemPrefab: {fileID: 1345714838427517041, guid: 7e6bb326193a66140be7f2817aa45365, type: 3}
 --- !u!1001 &6980734497737888231
 PrefabInstance:
   m_ObjectHideFlags: 0
