@@ -369,5 +369,5 @@ MonoBehaviour:
     canBeDropped: 0
     canBeEaten: 0
     canBeCarried: 0
-    itemBonusPercentage: 1
-    lootItemCodeList: 1e2700001f270000
+    itemBonusPercentage: 0.4
+    lootItemCodeList: 1c2700001d270000

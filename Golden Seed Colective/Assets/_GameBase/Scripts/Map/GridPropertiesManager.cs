@@ -16,6 +16,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
     [SerializeField] private SO_CropDetailsList so_CropDetailsList = null;
     [SerializeField] private SO_GridProperties[] so_gridPropertiesArray = null;
     [SerializeField] private Tile[] dugGround = null;
+    [SerializeField] private Tile[] treasureDugGround = null;
     [SerializeField] private Tile[] wateredGround = null;
 
     private string iSaveableUniqueID;
@@ -154,6 +155,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         }
     }
 
+    #region Plant dig
     public void DisplayDugGround(GridPropertyDetails gridPropertyDetails)
     {
         // Dug
@@ -176,7 +178,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
         // Check up
         adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && !adjacentGridPropertyDetails.isPlantable)
         {
             Tile dugTile1 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
             groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1, 0), dugTile1);
@@ -184,7 +186,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
         // Check down
         adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && adjacentGridPropertyDetails.isPlantable)
         {
             Tile dugTile2 = SetDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
             groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1, 0), dugTile2);
@@ -192,7 +194,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
         // Check left
         adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && adjacentGridPropertyDetails.isPlantable)
         {
             Tile dugTile3 = SetDugTile(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
             groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY, 0), dugTile3);
@@ -200,7 +202,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
         // CheckRight
         adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
-        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1)
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && adjacentGridPropertyDetails.isPlantable)
         {
             Tile dugTile4 = SetDugTile(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
             groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), dugTile4);
@@ -296,7 +298,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         {
             return false;
         }
-        else if (gridPropertyDetails.daysSinceDug > -1)
+        else if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.isPlantable)
         {
             return true;
         }
@@ -305,6 +307,161 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
             return false;
         }
     }
+    #endregion
+
+    #region TreasureDig
+    public void DisplayTreasureDugGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Dug
+        if (gridPropertyDetails.daysSinceDug > -1 && !gridPropertyDetails.isPlantable)
+        {
+            ConnectTreasureDugGround(gridPropertyDetails);
+        }
+    }
+
+    private void ConnectTreasureDugGround(GridPropertyDetails gridPropertyDetails)
+    {
+        // Select tile based on surrounding dug tiles
+
+        Tile dugTile0 = SetTreasureDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+        groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0), dugTile0);
+
+        // Set 4 tiles if dug surrounding current tile - up, down, left, right now that this central tile has been dug
+
+        GridPropertyDetails adjacentGridPropertyDetails;
+
+        // Check up
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && !adjacentGridPropertyDetails.isPlantable)
+        {
+            Tile dugTile1 = SetTreasureDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY + 1, 0), dugTile1);
+        }
+
+        // Check down
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && !adjacentGridPropertyDetails.isPlantable)
+        {
+            Tile dugTile2 = SetTreasureDugTile(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY - 1, 0), dugTile2);
+        }
+
+        // Check left
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && !adjacentGridPropertyDetails.isPlantable)
+        {
+            Tile dugTile3 = SetTreasureDugTile(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX - 1, gridPropertyDetails.gridY, 0), dugTile3);
+        }
+
+        // CheckRight
+        adjacentGridPropertyDetails = GetGridPropertyDetails(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+        if (adjacentGridPropertyDetails != null && adjacentGridPropertyDetails.daysSinceDug > -1 && !adjacentGridPropertyDetails.isPlantable)
+        {
+            Tile dugTile4 = SetTreasureDugTile(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY);
+            groundDecoration1.SetTile(new Vector3Int(gridPropertyDetails.gridX + 1, gridPropertyDetails.gridY, 0), dugTile4);
+        }
+    }
+
+    private Tile SetTreasureDugTile(int xGrid, int yGrid)
+    {
+        //Get whether surrounding tiles (up,down,left, and right) are dug or not
+
+        bool upDug = IsGridSquareTreasureDug(xGrid, yGrid + 1);
+        bool downDug = IsGridSquareTreasureDug(xGrid, yGrid - 1);
+        bool leftDug = IsGridSquareTreasureDug(xGrid - 1, yGrid);
+        bool rightDug = IsGridSquareTreasureDug(xGrid + 1, yGrid);
+
+        #region Set appropriate tile based on whether surrounding tiles are dug or not
+
+        if (!upDug && !downDug && !rightDug && !leftDug)
+        {
+            return treasureDugGround[0];
+        }
+        else if (!upDug && downDug && rightDug && !leftDug)
+        {
+            return treasureDugGround[1];
+        }
+        else if (!upDug && downDug && rightDug && leftDug)
+        {
+            return treasureDugGround[2];
+        }
+        else if (!upDug && downDug && !rightDug && leftDug)
+        {
+            return treasureDugGround[3];
+        }
+        else if (!upDug && downDug && !rightDug && !leftDug)
+        {
+            return treasureDugGround[4];
+        }
+        else if (upDug && downDug && rightDug && !leftDug)
+        {
+            return treasureDugGround[5];
+        }
+        else if (upDug && downDug && rightDug && leftDug)
+        {
+            return treasureDugGround[6];
+        }
+        else if (upDug && downDug && !rightDug && leftDug)
+        {
+            return treasureDugGround[7];
+        }
+        else if (upDug && downDug && !rightDug && !leftDug)
+        {
+            return treasureDugGround[8];
+        }
+        else if (upDug && !downDug && rightDug && !leftDug)
+        {
+            return treasureDugGround[9];
+        }
+        else if (upDug && !downDug && rightDug && leftDug)
+        {
+            return treasureDugGround[10];
+        }
+        else if (upDug && !downDug && !rightDug && leftDug)
+        {
+            return treasureDugGround[11];
+        }
+        else if (upDug && !downDug && !rightDug && !leftDug)
+        {
+            return treasureDugGround[12];
+        }
+        else if (!upDug && !downDug && rightDug && !leftDug)
+        {
+            return treasureDugGround[13];
+        }
+        else if (!upDug && !downDug && rightDug && leftDug)
+        {
+            return treasureDugGround[14];
+        }
+        else if (!upDug && !downDug && !rightDug && leftDug)
+        {
+            return treasureDugGround[15];
+        }
+
+        return null;
+
+        #endregion Set appropriate tile based on whether surrounding tiles are dug or not
+    }
+
+    private bool IsGridSquareTreasureDug(int xGrid, int yGrid)
+    {
+        GridPropertyDetails gridPropertyDetails = GetGridPropertyDetails(xGrid, yGrid);
+
+        if (gridPropertyDetails == null)
+        {
+            return false;
+        }
+        else if (gridPropertyDetails.daysSinceDug > -1 && !gridPropertyDetails.isPlantable)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    #endregion
 
     public void DisplayWateredGround(GridPropertyDetails gridPropertyDetails)
     {

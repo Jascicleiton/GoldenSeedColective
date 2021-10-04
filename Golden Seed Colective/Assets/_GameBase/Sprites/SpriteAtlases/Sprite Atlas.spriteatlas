@@ -848,6 +848,38 @@ SpriteAtlas:
   - {fileID: -7746961489531447020, guid: afba78ae84664a941a55c31758ab5cf9, type: 3}
   - {fileID: -5900568562052052237, guid: afba78ae84664a941a55c31758ab5cf9, type: 3}
   - {fileID: 21300000, guid: 6cefe32f730a75046ab8e8e5434d336e, type: 3}
+  - {fileID: 2705426237867923350, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 8053294480813063422, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -3313916020442719962, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 4956654873723976577, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 5920405692881246800, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 2894803696904836070, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -1424849896060165826, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -5112248265870479310, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 1066448519575882737, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 3234172206306931616, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 7527525131646010626, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -7309668948476829424, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 4914642431000830886, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 6672791278820207880, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 8279940546018249830, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -8437569228131110785, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 5725545949256274253, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 7416654666140294132, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 6234618345233167722, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -4789113316106445195, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -3707797497212052126, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 7464004479336202008, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 7501677074224036046, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -8731430983577569767, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -6291483462540179603, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 7203858037554445009, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 323138060335764109, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 6504087274656832872, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: 4251657370806415516, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -2157804470931706837, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -3467105735414922034, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
+  - {fileID: -2712298581495703773, guid: c6f13d3f894315f47baf4e34b6d44589, type: 3}
   - {fileID: -8889897509666649805, guid: 400e208f8ff6631429ef6ca968c16ad2, type: 3}
   - {fileID: 6224320500644084454, guid: 400e208f8ff6631429ef6ca968c16ad2, type: 3}
   - {fileID: 8544150700639678146, guid: 400e208f8ff6631429ef6ca968c16ad2, type: 3}
@@ -1682,6 +1714,38 @@ SpriteAtlas:
   - Butch_16
   - Butch_15
   - WildOakScenary
+  - TreasureDugGround_4
+  - TreasureDugGround_5
+  - TreasureDugGround_6
+  - TreasureDugGround_7
+  - TreasureDugGround_0
+  - TreasureDugGround_1
+  - TreasureDugGround_2
+  - TreasureDugGround_3
+  - TreasureDugGround_8
+  - TreasureDugGround_9
+  - TreasureDugGround_19
+  - TreasureDugGround_18
+  - TreasureDugGround_17
+  - TreasureDugGround_16
+  - TreasureDugGround_15
+  - TreasureDugGround_14
+  - TreasureDugGround_13
+  - TreasureDugGround_12
+  - TreasureDugGround_11
+  - TreasureDugGround_10
+  - TreasureDugGround_22
+  - TreasureDugGround_23
+  - TreasureDugGround_20
+  - TreasureDugGround_21
+  - TreasureDugGround_26
+  - TreasureDugGround_27
+  - TreasureDugGround_24
+  - TreasureDugGround_25
+  - TreasureDugGround_31
+  - TreasureDugGround_30
+  - TreasureDugGround_28
+  - TreasureDugGround_29
   - Cora_8
   - Cora_7
   - Cora_6

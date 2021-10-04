@@ -348,7 +348,7 @@ public class Player : Singleton<Player>
 
     private void ProcessPlayerClickInputSeed(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails)
     {
-        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.seedItemCode == -1)
+        if (itemDetails.canBeDropped && gridCursor.CursorPositionIsValid && gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.seedItemCode == -1 && gridPropertyDetails.isPlantable)
         {
             PlantSeedAtCursor(gridPropertyDetails, itemDetails);
         }
@@ -410,7 +410,7 @@ public class Player : Singleton<Player>
             case ItemType.DiggingTool:
                 if (gridCursor.CursorPositionIsValid)
                 {
-                    DigInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
+                    TreasureDigInPlayerDirection(gridPropertyDetails, itemDetails, playerDirection);
                 }
                 break;
             default:
@@ -519,6 +519,8 @@ public class Player : Singleton<Player>
         {
             gridPropertyDetails.daysSinceDug = 0;
         }
+
+        gridPropertyDetails.isPlantable = true;
 
         // Set gridProperty to dug
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
@@ -712,12 +714,12 @@ public class Player : Singleton<Player>
 
     }
 
-    private void DigInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    private void TreasureDigInPlayerDirection(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
     {
-        StartCoroutine(DigInPlayerDirectionRoutine(gridPropertyDetails, itemDetails, playerDirection));
+        StartCoroutine(TreasureDigInPlayerDirectionRoutine(gridPropertyDetails, itemDetails, playerDirection));
     }
 
-    private IEnumerator DigInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
+    private IEnumerator TreasureDigInPlayerDirectionRoutine(GridPropertyDetails gridPropertyDetails, ItemDetails itemDetails, Vector3Int playerDirection)
     {
         _playerInputIsDisabled = true;
         playerToolUseDisabled = true;
@@ -753,11 +755,14 @@ public class Player : Singleton<Player>
             gridPropertyDetails.daysSinceDug = 0;
         }
 
+        // Set gridPropertyDetails for treasure dug ground
+        gridPropertyDetails.isPlantable = false;
+
         // Set gridProperty to dug
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
         // Display dug grid tiles
-        GridPropertiesManager.Instance.DisplayDugGround(gridPropertyDetails);
+        GridPropertiesManager.Instance.DisplayTreasureDugGround(gridPropertyDetails);
 
         SpawnDugItems(itemDetails);
 
@@ -775,13 +780,13 @@ public class Player : Singleton<Player>
         {
             if (equippedItemDetails.itemBonusPercentage > 0)
             {
-                float chanceToHarvest = Random.Range(0, 1);
+                float chanceToHarvest = Random.Range(0f, 1f);
                 
                 if (chanceToHarvest <= equippedItemDetails.itemBonusPercentage)
                 {
                     for (int i = 0; i < equippedItemDetails.lootItemCodeList.Count; i++)
                     {
-                        Vector3 worldPosition = new Vector3((gameObject.transform.position.x + Random.Range(0.5f, 1f)), (gameObject.transform.position.y + Random.Range(0.5f, 1f)), -mainCamera.transform.position.z);
+                        Vector3 worldPosition = new Vector3((gameObject.transform.position.x + Random.Range(1f, 2f)), (gameObject.transform.position.y + Random.Range(1f, 2f)), -mainCamera.transform.position.z);
                         // Create item from prefab at mouse position
                         GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2, worldPosition.z), Quaternion.identity, parentItem);
                         Item item = itemGameObject.GetComponent<Item>();

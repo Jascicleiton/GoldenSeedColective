@@ -70,7 +70,8 @@ public enum GridBoolProperty
     canDropItem,
     canPlaceFurniture,
     isPath,
-    isNPCObstacle
+    isNPCObstacle,
+    plantable
 }
 
 public enum InventoryLocation
