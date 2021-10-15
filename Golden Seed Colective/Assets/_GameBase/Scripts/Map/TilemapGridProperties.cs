@@ -41,7 +41,7 @@ public class TilemapGridProperties : MonoBehaviour
             if (gridProperties != null)
             {
                 // This is required to ensure that the updated gridproperties gameobject gets saved when the game is saved - otherwise they are not saved
-                EditorUtility.SetDirty(gridProperties);
+               // EditorUtility.SetDirty(gridProperties);
             }
         }
     }

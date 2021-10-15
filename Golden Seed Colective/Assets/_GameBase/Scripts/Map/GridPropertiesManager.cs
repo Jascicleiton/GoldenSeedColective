@@ -38,6 +38,8 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         InitialiseGridProperties();
     }
 
+
+
     private void OnEnable()
     {
         ISaveableRegister();
@@ -463,6 +465,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
     }
     #endregion
 
+    #region Watered Ground
     public void DisplayWateredGround(GridPropertyDetails gridPropertyDetails)
     {
         // Watered
@@ -615,6 +618,8 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         }
     }
 
+    #endregion
+
     private void DisplayGridPropertyDetails()
     {
         // Loop through all grid items
@@ -643,36 +648,63 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
             if (cropDetails != null)
             {
-                // prefab to use
-                GameObject cropPrefab;
-
-                int growthStages = cropDetails.growthDays.Length;
-
-                int currentGrowthStage = 0;
-
-                for (int i = growthStages - 1; i >= 0; i--)
+                if (gridPropertyDetails.daysSinceLastTend >= cropDetails.daysWithoutBeingTended)
                 {
-                    if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
-                    {
-                        currentGrowthStage = i;
-                        break;
-                    }
+                    // prefab to use as whitered plant
+                    GameObject whiteredCropPrefab;
+
+
+                    whiteredCropPrefab = cropDetails.whiteredPrefab;
+
+                    Sprite whiteredSprite = cropDetails.whiteredSprite;
+
+                    Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+                    worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+
+                    // instantiate crop prefab at grid location
+                    GameObject cropInstance = Instantiate(whiteredCropPrefab, worldPosition, Quaternion.identity);
+
+                    cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = whiteredSprite;
+                    cropInstance.transform.SetParent(cropParentTransform);
+                    cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+
+
                 }
+                else
+                {
+                    // prefab to use
+                    GameObject cropPrefab;
 
-                cropPrefab = cropDetails.growthPrefabs[currentGrowthStage];
+                    int growthStages = cropDetails.growthDays.Length;
 
-                Sprite growthSprite = cropDetails.growthSprites[currentGrowthStage];
+                    int currentGrowthStage = 0;
 
-                Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+                    for (int i = growthStages - 1; i >= 0; i--)
+                    {
+                        if (gridPropertyDetails.growthDays >= cropDetails.growthDays[i])
+                        {
+                            currentGrowthStage = i;
+                            break;
+                        }
+                    }
 
-                worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+                    cropPrefab = cropDetails.growthPrefabs[currentGrowthStage];
 
-                // instantiate crop prefab at grid location
-                GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
+                    Sprite growthSprite = cropDetails.growthSprites[currentGrowthStage];
 
-                cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
-                cropInstance.transform.SetParent(cropParentTransform);
-                cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+                    Vector3 worldPosition = groundDecoration2.CellToWorld(new Vector3Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY, 0));
+
+                    worldPosition = new Vector3(worldPosition.x + Settings.gridCellSize / 2, worldPosition.y, worldPosition.z);
+
+                    // instantiate crop prefab at grid location
+                    GameObject cropInstance = Instantiate(cropPrefab, worldPosition, Quaternion.identity);
+
+                    cropInstance.GetComponentInChildren<SpriteRenderer>().sprite = growthSprite;
+                    cropInstance.transform.SetParent(cropParentTransform);
+                    cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
+
+                }
             }
         }
     }
@@ -926,7 +958,20 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
                         if (gridPropertyDetails.growthDays > -1)
                         {
                             gridPropertyDetails.growthDays += 1;
+                            gridPropertyDetails.daysSinceLastTend += 1;
                         }
+                        // If a crop is not tended for 3 or more days is destroyed
+                        if(gridPropertyDetails.daysSinceLastTend >= 3)
+                        {
+                          Crop cropToDelete = GetCropObjectAtGridLocation(gridPropertyDetails);
+                            if (cropToDelete != null)
+                            {
+                                gridPropertyDetails.daysSinceLastTend = 0;
+                                Destroy(cropToDelete.gameObject);
+                            }
+             
+                        }
+                       
 
                         // If ground is watered, then clear water
                         if (gridPropertyDetails.daysSinceWatered > -1)

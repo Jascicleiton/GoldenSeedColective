@@ -67,6 +67,8 @@ public class Player : Singleton<Player>
     private bool _playerInputIsDisabled = false;
     public bool PlayerInputIsDisabled { get { return _playerInputIsDisabled; } }
 
+    private float wellbeing = 100f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -102,6 +104,7 @@ public class Player : Singleton<Player>
         EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
         EventHandler.AfterSceneLoadEvent += SceneLoaded;
+        EventHandler.ChangeWellBeing += ChangeWellBeing;
     }
 
     private void OnDisable()
@@ -109,6 +112,7 @@ public class Player : Singleton<Player>
         EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
         EventHandler.AfterSceneLoadEvent -= SceneLoaded;
+        EventHandler.ChangeWellBeing += ChangeWellBeing;
     }
 
     private void Update()
@@ -465,6 +469,9 @@ public class Player : Singleton<Player>
             gridPropertyDetails.daysSinceWatered = 0;
         }
 
+        // Set gridPropertyDetails daysSinceLastTend to 0
+        gridPropertyDetails.daysSinceLastTend = 0;
+
         // Set gridProperty to watered
         GridPropertiesManager.Instance.SetGridPropertyDetails(gridPropertyDetails.gridX, gridPropertyDetails.gridY, gridPropertyDetails);
 
@@ -798,7 +805,7 @@ public class Player : Singleton<Player>
                 else
                 {
                     //TODO: Create a variable for the wellbeing change
-                    EventHandler.CallChangeWellBeing(-1f);
+                    EventHandler.CallChangeWellBeing(-20f);
                 }
             }
         }
@@ -979,4 +986,22 @@ public class Player : Singleton<Player>
     {
         parentItem = GameObject.FindGameObjectWithTag(Tags.ItemsParentTransform).transform;
     }
+
+    private void ChangeWellBeing(float valueToChange)
+    {
+        wellbeing += valueToChange;
+        print(wellbeing);
+        if(wellbeing > 100f)
+        {
+            wellbeing = 100f;
+        }
+        if(wellbeing <= 0)
+        {
+            wellbeing = 0;
+            EventHandler.CallGameOver();
+            print("GameOver1;");
+        }
+    }
+
+   
 }

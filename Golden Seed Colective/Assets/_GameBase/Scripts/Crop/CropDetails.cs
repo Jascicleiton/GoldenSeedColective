@@ -7,7 +7,9 @@ public class CropDetails
     public int seedItemCode; // this is the item code for the corresponding seed
     public int[] growthDays; // days of growth for each stage
     public GameObject[] growthPrefabs; // prefab to use when instantiating growth stages
+    public GameObject whiteredPrefab; // prefab to use when instantiating whitered crop
     public Sprite[] growthSprites; // growth sprite for each stages
+    public Sprite whiteredSprite;
     public Season[] seasons; // each season that the crop grows - TODO: Implement on the game! or not!
     public Sprite harvestedSprite; // sprite used once harvested
 
@@ -29,6 +31,8 @@ public class CropDetails
     public int[] cropProducedMinQuantity; // array of minimu quantities produced for the harvested crop
     public int[] cropProducedMaxQuantitty; // if max quantity is > minQuantity, then a random number between them is produced
     public int daysToRegrow; // days to regrow next crop or -1 if it is a single crop TODO: need to implement this
+   public int daysWithoutBeingTended = 3;
+   // public int daysSinceTended; // days since last tended the crop. If not tended for daysWithoutBeingTended it whiters.
 
     /// <summary>
     /// Returns true if the toolItemCode can be used to harvest this crop, else returns false

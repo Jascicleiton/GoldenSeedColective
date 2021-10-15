@@ -231,5 +231,15 @@ public static class EventHandler
             ChangeWellBeing(wellbeingValueToChange);
         }
     }
+
+    public static event Action GameOver;
+
+    public static void CallGameOver()
+    {
+        if(GameOver != null)
+        {
+            GameOver();
+        }
+    }
     #endregion
 }
