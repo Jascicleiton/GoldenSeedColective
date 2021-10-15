@@ -29,10 +29,10 @@ public class TimeManager : Singleton<TimeManager>
 
     private void Update()
     {
-        if (!gameClockPaused)
-        {
-            GameTick();
-        }
+        //if (!gameClockPaused)
+        //{
+        //    GameTick();
+        //}
     }
 
     private void GameTick()
@@ -116,7 +116,7 @@ public class TimeManager : Singleton<TimeManager>
         EventHandler.CallAdvanceGameYearEvent(gameYear, gameSeason, gameDay, gameDayOfWeek, gameHour, gameMinute, gameSecond);
     }
 
-    private string GetDayOfWeek()
+    public string GetDayOfWeek()
     {
         int totalDays = (((int)gameSeason) * Settings.daysToSeason) + gameDay;
         int dayOfWeek = totalDays % Settings.daysToWeek;

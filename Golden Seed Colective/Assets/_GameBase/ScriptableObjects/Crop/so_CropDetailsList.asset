@@ -100,7 +100,7 @@ MonoBehaviour:
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantitty: 02000000
     daysToRegrow: -1
-    daysWithoutBeingTended: 3
+    daysWithoutBeingTended: 10000000
   - seedItemCode: 10009
     growthDays: 00000000050000000a0000000f00000014000000
     growthPrefabs:
@@ -156,7 +156,7 @@ MonoBehaviour:
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantitty: 03000000
     daysToRegrow: -1
-    daysWithoutBeingTended: 3
+    daysWithoutBeingTended: 10000000
   - seedItemCode: 10014
     growthDays: 00000000
     growthPrefabs:
@@ -180,7 +180,7 @@ MonoBehaviour:
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantitty: 02000000
     daysToRegrow: -1
-    daysWithoutBeingTended: 3
+    daysWithoutBeingTended: 10000000
   - seedItemCode: 10016
     growthDays: 00000000
     growthPrefabs:
@@ -204,4 +204,4 @@ MonoBehaviour:
     cropProducedMinQuantity: 01000000
     cropProducedMaxQuantitty: 02000000
     daysToRegrow: -1
-    daysWithoutBeingTended: 3
+    daysWithoutBeingTended: 10000000

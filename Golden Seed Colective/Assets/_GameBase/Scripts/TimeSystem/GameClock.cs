@@ -7,12 +7,17 @@ public class GameClock : MonoBehaviour
 
     private void OnEnable()
     {
-        EventHandler.AdvanceGameMinuteEvent += UpdateGameTime;
+        EventHandler.AdvanceGameDayEvent += UpdateGameTime;
     }
 
     private void OnDisable()
     {
-        EventHandler.AdvanceGameMinuteEvent -= UpdateGameTime;
+        EventHandler.AdvanceGameDayEvent -= UpdateGameTime;
+    }
+
+    private void Start()
+    {
+        UpdateGameTime(33, Season.Spring, 24, TimeManager.Instance.GetDayOfWeek(), 7, 0, 0);
     }
 
     private void UpdateGameTime(int gameYear, Season gameSeason, int gameDay, string gameDayOfWeek, int gameHour, int gameMinute, int gameSecond)

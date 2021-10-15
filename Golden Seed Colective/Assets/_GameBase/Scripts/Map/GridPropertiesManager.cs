@@ -653,7 +653,6 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
                     // prefab to use as whitered plant
                     GameObject whiteredCropPrefab;
 
-
                     whiteredCropPrefab = cropDetails.whiteredPrefab;
 
                     Sprite whiteredSprite = cropDetails.whiteredSprite;
@@ -669,7 +668,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
                     cropInstance.transform.SetParent(cropParentTransform);
                     cropInstance.GetComponent<Crop>().cropGridPosition = new Vector2Int(gridPropertyDetails.gridX, gridPropertyDetails.gridY);
 
-
+                    EventHandler.CallChangeWellBeing(-10f);
                 }
                 else
                 {
@@ -960,18 +959,6 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
                             gridPropertyDetails.growthDays += 1;
                             gridPropertyDetails.daysSinceLastTend += 1;
                         }
-                        // If a crop is not tended for 3 or more days is destroyed
-                        if(gridPropertyDetails.daysSinceLastTend >= 3)
-                        {
-                          Crop cropToDelete = GetCropObjectAtGridLocation(gridPropertyDetails);
-                            if (cropToDelete != null)
-                            {
-                                gridPropertyDetails.daysSinceLastTend = 0;
-                                Destroy(cropToDelete.gameObject);
-                            }
-             
-                        }
-                       
 
                         // If ground is watered, then clear water
                         if (gridPropertyDetails.daysSinceWatered > -1)
