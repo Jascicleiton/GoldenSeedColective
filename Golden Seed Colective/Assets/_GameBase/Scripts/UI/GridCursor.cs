@@ -171,7 +171,7 @@ public class GridCursor : MonoBehaviour
         switch (itemDetails.itemType)
         {
             case ItemType.WateringTool:
-                if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1)
+                if (gridPropertyDetails.daysSinceDug > -1 && gridPropertyDetails.daysSinceWatered == -1 && gridPropertyDetails.daysSinceLastTend <= Settings.maxDaysWithoutBeingTended)
                 {
                     return true;
                 }

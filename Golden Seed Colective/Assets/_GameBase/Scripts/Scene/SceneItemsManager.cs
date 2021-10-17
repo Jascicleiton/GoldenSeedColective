@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -84,7 +84,7 @@ public class SceneItemsManager : Singleton<SceneItemsManager>, ISaveable
 
     public void ISaveableStoreScene(string sceneName)
     {
-        // Remove old scene sabe of gameObject if exists
+        // Remove old scene save of gameObject if exists
         GameObjectSave.sceneData.Remove(sceneName);
 
         // Get all items in the scene
@@ -126,6 +126,25 @@ public class SceneItemsManager : Singleton<SceneItemsManager>, ISaveable
                 // now instantiate the list of scene items
                 InstantiateSceneItems(sceneSave.listSceneItem);
             }
+        }
+    }
+
+    public GameObjectSave ISaveableSave()
+    {
+        // Store current scene data
+        ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+
+        return GameObjectSave;
+    }
+
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // Restore data for current scene
+            ISaveableRestoreScene(SceneManager.GetActiveScene().name);
         }
     }
 }

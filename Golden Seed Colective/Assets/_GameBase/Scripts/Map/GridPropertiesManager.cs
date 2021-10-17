@@ -648,7 +648,7 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
 
             if (cropDetails != null)
             {
-                if (gridPropertyDetails.daysSinceLastTend >= cropDetails.daysWithoutBeingTended)
+                if (gridPropertyDetails.daysSinceLastTend > Settings.maxDaysWithoutBeingTended)
                 {
                     // prefab to use as whitered plant
                     GameObject whiteredCropPrefab;
@@ -830,16 +830,24 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
     }
 
-    //public void ISaveableLoad(GameSave gameSave)
-    //{
-    //    if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
-    //    {
-    //        GameObjectSave = gameObjectSave;
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Remove sceneSave for scene
+        GameObjectSave.sceneData.Remove(sceneName);
 
-    //        // Restore data for current scene
-    //        ISaveableRestoreScene(SceneManager.GetActiveScene().name);
-    //    }
-    //}
+        // Create sceneSave for scene
+        SceneSave sceneSave = new SceneSave();
+
+        // create & add dict grid property details dictionary
+        sceneSave.gridPropertyDetailsDictionary = gridPropertyDictionary;
+
+        // create & add bool dictionary for first time scene loaded
+        sceneSave.boolDictionary = new Dictionary<string, bool>();
+        sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", isFirstTimeSceneLoaded);
+
+        // Add scene save to game object scene data
+        GameObjectSave.sceneData.Add(sceneName, sceneSave);
+    }
 
     public void ISaveableRestoreScene(string sceneName)
     {
@@ -890,23 +898,15 @@ public class GridPropertiesManager : Singleton<GridPropertiesManager>, ISaveable
         return GameObjectSave;
     }
 
-    public void ISaveableStoreScene(string sceneName)
+    public void ISaveableLoad(GameSave gameSave)
     {
-        // Remove sceneSave for scene
-        GameObjectSave.sceneData.Remove(sceneName);
+        if (gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
 
-        // Create sceneSave for scene
-        SceneSave sceneSave = new SceneSave();
-
-        // create & add dict grid property details dictionary
-        sceneSave.gridPropertyDetailsDictionary = gridPropertyDictionary;
-
-        // create & add bool dictionary for first time scene loaded
-        sceneSave.boolDictionary = new Dictionary<string, bool>();
-        sceneSave.boolDictionary.Add("isFirstTimeSceneLoaded", isFirstTimeSceneLoaded);
-
-        // Add scene save to game object scene data
-        GameObjectSave.sceneData.Add(sceneName, sceneSave);
+            // Restore data for current scene
+            ISaveableRestoreScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     /// <summary>

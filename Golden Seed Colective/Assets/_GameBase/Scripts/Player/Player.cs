@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class Player : Singleton<Player>
+public class Player : Singleton<Player>, ISaveable
 {
     private WaitForSeconds useToolAnimationPause;
     private WaitForSeconds liftToolAnimationPause;
@@ -42,10 +44,7 @@ public class Player : Singleton<Player>
     private Camera mainCamera;
 
     private Rigidbody2D myRigidbody2D;
-#pragma warning disable 414
     private Direction playerDirection;
-
-#pragma warning restore 414
 
     private GridCursor gridCursor;
     private Cursor cursor;
@@ -67,6 +66,11 @@ public class Player : Singleton<Player>
     private bool _playerInputIsDisabled = false;
     public bool PlayerInputIsDisabled { get { return _playerInputIsDisabled; } }
 
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
+
     private float wellbeing = 100f;
 
     protected override void Awake()
@@ -82,6 +86,11 @@ public class Player : Singleton<Player>
 
         // Initialise character attribute list
         characterAttributeCustomisationList = new List<CharacterAttribute>();
+
+        // Get Unique ID for gameobject and create save data object
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+
+        GameObjectSave = new GameObjectSave();
 
         // get reference to mainCamera;
         mainCamera = Camera.main;
@@ -101,14 +110,19 @@ public class Player : Singleton<Player>
 
     private void OnEnable()
     {
+        ISaveableRegister();
+
         EventHandler.BeforeSceneUnloadFadeOutEvent += DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent += EnablePlayerInput;
         EventHandler.AfterSceneLoadEvent += SceneLoaded;
         EventHandler.ChangeWellBeing += ChangeWellBeing;
+
     }
 
     private void OnDisable()
     {
+        ISaveableDeregister();
+
         EventHandler.BeforeSceneUnloadFadeOutEvent -= DisablePlayerInputAndResetMovement;
         EventHandler.AfterSceneLoadFadeInEvent -= EnablePlayerInput;
         EventHandler.AfterSceneLoadEvent -= SceneLoaded;
@@ -169,6 +183,39 @@ public class Player : Singleton<Player>
         isSwingingToolUp = false;
         isSwingingToolDown = false;
         toolEffect = ToolEffect.none;
+    }
+
+    private void SetPlayerDirection(Direction playerDirection)
+    {
+        switch (playerDirection)
+        {
+            case Direction.right:
+                // set idle up trigger
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, true,
+                    false, false, false);
+                break;
+            case Direction.left:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+                    true, false, false);
+                break;
+            case Direction.up:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+                    false, true, false);
+                break;
+            case Direction.down:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+                    false, false, true);
+                break;
+            default:
+                EventHandler.CallMovementEvent(0f, 0f, false, false, false, false, ToolEffect.none, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+                    false, false, true);
+                break;
+        }
     }
 
     private void PlayerMovementInput()
@@ -787,13 +834,13 @@ public class Player : Singleton<Player>
         {
             if (equippedItemDetails.itemBonusPercentage > 0)
             {
-                float chanceToHarvest = Random.Range(0f, 1f);
+                float chanceToHarvest = UnityEngine.Random.Range(0f, 1f);
                 
                 if (chanceToHarvest <= equippedItemDetails.itemBonusPercentage)
                 {
                     for (int i = 0; i < equippedItemDetails.lootItemCodeList.Count; i++)
                     {
-                        Vector3 worldPosition = new Vector3((gameObject.transform.position.x + Random.Range(1f, 2f)), (gameObject.transform.position.y + Random.Range(1f, 2f)), -mainCamera.transform.position.z);
+                        Vector3 worldPosition = new Vector3((gameObject.transform.position.x + UnityEngine.Random.Range(1f, 2f)), (gameObject.transform.position.y + UnityEngine.Random.Range(1f, 2f)), -mainCamera.transform.position.z);
                         // Create item from prefab at mouse position
                         GameObject itemGameObject = Instantiate(itemPrefab, new Vector3(worldPosition.x, worldPosition.y - Settings.gridCellSize / 2, worldPosition.z), Quaternion.identity, parentItem);
                         Item item = itemGameObject.GetComponent<Item>();
@@ -980,6 +1027,7 @@ public class Player : Singleton<Player>
         {
             TimeManager.Instance.TestAdvanceGameSeason();
         }
+       
     }
 
     private void SceneLoaded()
@@ -1003,5 +1051,91 @@ public class Player : Singleton<Player>
         }
     }
 
-   
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
+
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+    public GameObjectSave ISaveableSave()
+    {
+        // Delete saveScene for game object if it already exists
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Create saveScene for gameObject
+        SceneSave sceneSave = new SceneSave();
+
+        // Create Vector3 Dictionary
+        sceneSave.vector3Dictionary = new Dictionary<string, Vector3Serializable>();
+
+        // Create String Dictionary
+        sceneSave.stringDictionary = new Dictionary<string, string>();
+
+        // Add Player position to Vector3 dictionary
+        Vector3Serializable vector3Serializable = new Vector3Serializable(transform.position.x, transform.position.y, transform.position.z);
+        sceneSave.vector3Dictionary.Add("playerPosition", vector3Serializable);
+
+        // Add current SceneName to string dictionary
+        sceneSave.stringDictionary.Add("currentScene", SceneManager.GetActiveScene().name);
+
+        // Add player Direction to string dictionary
+        sceneSave.stringDictionary.Add("playerDirection", playerDirection.ToString());
+
+        // Add sceneSave data for player game object
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        return GameObjectSave;
+    }
+
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            // Get save dictionary for scene
+            if(gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // Get player position
+                if (sceneSave.vector3Dictionary != null && sceneSave.vector3Dictionary.TryGetValue("playerPosition", out Vector3Serializable playerPosition))
+                {
+                    transform.position = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+                }
+
+                // Get string dictionary
+                if(sceneSave.stringDictionary != null)
+                {
+                    // Get player scene
+                    if(sceneSave.stringDictionary.TryGetValue("currentScene", out string currentScene))
+                    {
+                        SceneControllerManager.Instance.FadeAndLoadScene(currentScene, transform.position);
+                    }
+
+                    // Get player direction
+                    if(sceneSave.stringDictionary.TryGetValue("playerDirection", out string playerDir))
+                    {
+                        bool playerDirFound = Enum.TryParse<Direction>(playerDir, true, out Direction direction);
+
+                        if(playerDirFound)
+                        {
+                            playerDirection = direction;
+                            SetPlayerDirection(playerDirection);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing required here since the player is on a persistent scene;
+    }
+
+    public void ISaveableRestoreScene(string sceneName)
+    {
+        // Nothing required here since the player is on a persistent scene;
+    }
 }

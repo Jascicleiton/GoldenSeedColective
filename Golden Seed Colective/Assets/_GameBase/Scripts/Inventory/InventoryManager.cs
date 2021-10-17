@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class InventoryManager : Singleton<InventoryManager>
+public class InventoryManager : Singleton<InventoryManager>, ISaveable
 {
+    private UIInventoryBar inventoryBar;
+
     private Dictionary<int, ItemDetails> itemDetailsDictionary;
     private int[] selectedInventoryItem; // the index of the array is the inventory list, and the value is the item code
 
@@ -13,6 +15,12 @@ public class InventoryManager : Singleton<InventoryManager>
 
     // the index of the array is the inventory list (from the InventoryLocation enum), and the value is the capacity of that inventory list
     [HideInInspector] public int[] inventoryListCapacityIntArray;
+
+    private string _iSaveableUniqueID;
+    public string ISaveableUniqueID { get { return _iSaveableUniqueID; } set { _iSaveableUniqueID = value; } }
+
+    private GameObjectSave _gameObjectSave;
+    public GameObjectSave GameObjectSave { get { return _gameObjectSave; } set { _gameObjectSave = value; } }
 
     protected override void Awake()
     {
@@ -30,6 +38,25 @@ public class InventoryManager : Singleton<InventoryManager>
         {
             selectedInventoryItem[i] = -1;
         }
+
+        // Get unique ID for gameObject and create save data object;
+        ISaveableUniqueID = GetComponent<GenerateGUID>().GUID;
+        GameObjectSave = new GameObjectSave();
+    }
+
+    private void Start()
+    {
+        inventoryBar = FindObjectOfType<UIInventoryBar>();
+    }
+
+    private void OnEnable()
+    {
+        ISaveableRegister();
+    }
+
+    private void OnDisable()
+    {
+        ISaveableDeregister();
     }
 
     private void CreateInventoryLists()
@@ -45,6 +72,8 @@ public class InventoryManager : Singleton<InventoryManager>
 
         // Initialise player inventory list capacity
         inventoryListCapacityIntArray[(int)InventoryLocation.player] = Settings.playerInitialInventoryCapacity;
+        
+       
     }
 
     private void RemoveItemAtPostition(List<InventoryItem> inventoryList, int itemCode, int position)
@@ -317,7 +346,82 @@ public class InventoryManager : Singleton<InventoryManager>
         selectedInventoryItem[(int)inventoryLocation] = -1;
     }
 
+    public void ISaveableRegister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Add(this);
+    }
 
+    public void ISaveableDeregister()
+    {
+        SaveLoadManager.Instance.iSaveableObjectList.Remove(this);
+    }
+
+    public GameObjectSave ISaveableSave()
+    {
+        // Crete new scene save
+        SceneSave sceneSave = new SceneSave();
+
+        // Remove any existing scene save for persistent scene for this gameObject
+        GameObjectSave.sceneData.Remove(Settings.PersistentScene);
+
+        // Add inventory lists array to persistent scene save
+        sceneSave.listInvItemArray = inventoryLists;
+
+        // Add inventory list capacity array to persistent scene save
+        sceneSave.intArrayDictionary = new Dictionary<string, int[]>();
+        sceneSave.intArrayDictionary.Add("inventoryListCapacityArray", inventoryListCapacityIntArray);
+
+        // Add scene save for gameObject
+        GameObjectSave.sceneData.Add(Settings.PersistentScene, sceneSave);
+
+        return GameObjectSave;
+    }
+
+    public void ISaveableLoad(GameSave gameSave)
+    {
+        if(gameSave.gameObjectData.TryGetValue(ISaveableUniqueID, out GameObjectSave gameObjectSave))
+        {
+            GameObjectSave = gameObjectSave;
+
+            // Need to find inventory lists - start by trying to locate saveScene for game object
+            if(gameObjectSave.sceneData.TryGetValue(Settings.PersistentScene, out SceneSave sceneSave))
+            {
+                // list inventory items array exists for persistent scene
+                if(sceneSave.listInvItemArray != null)
+                {
+                    inventoryLists = sceneSave.listInvItemArray;
+
+                    // Send events that inventory has been updated
+                    for (int i = 0; i < (int)InventoryLocation.count; i++)
+                    {
+                        EventHandler.CallInventoryUpdatedEvent((InventoryLocation)i, inventoryLists[i]);
+                    }
+
+                    // Clear any items player was carrying
+                    Player.Instance.ClearCarriedItem();
+
+                    // Clear any highlights on inventory bar
+                    inventoryBar.ClearHighLightOnInventorySlots();
+                }
+
+                // int array dictionary exists for scene
+                if(sceneSave.intArrayDictionary != null && sceneSave.intArrayDictionary.TryGetValue("inventoryListCapacityArray", out int[] inventoryCapacityArray))
+                {
+                    inventoryListCapacityIntArray = inventoryCapacityArray;
+                }
+            }
+        }
+    }
+
+    public void ISaveableStoreScene(string sceneName)
+    {
+        // Nothing required here since the player is on a persistent scene;
+    }
+
+    public void ISaveableRestoreScene(string sceneName)
+    {
+        // Nothing required here since the player is on a persistent scene;
+    }
 
     //private void DebugPrintInventoryList(List<InventoryItem> inventoryList)
     //{

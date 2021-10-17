@@ -2,6 +2,9 @@
 
 public static class Settings
 {
+    // Scenes
+    public const string PersistentScene = "PersistendScene";
+
     // Obscuring Item fading - ObscuringItemFader
     public const float fadeInSeconds = 0.25f;
     public const float fadeOutSeconds = 0.35f;
@@ -68,6 +71,9 @@ public static class Settings
     // Reaping
     public const int maxCollidersToTestPerReapSwing = 15;
     public const int maxTargetComponentsToDestroyPerReapSwing = 2;
+
+    // Golden seeds
+    public const int maxDaysWithoutBeingTended = 2;
 
     // Time System
     public const float secondsPerGameSecond = 0.012f;
